@@ -1,5 +1,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
+var mongoose = require('mongoose');
+
 
 //URL for the cars we want to look for.
 var OPTIONS = {
@@ -16,9 +18,10 @@ request(OPTIONS, function(err, response, body){
     // console.log(body);
     var $ = cheerio.load(body);
     var results = $('a[data-qaid="lnk-lstgTtlf"]');
+    //could be rewritten as results.each(function(index, result))
     for (var i = 0; i<results.length; i++){
       var url = "http://www.autotrader.com/"+results[i].attribs.href;
-      var car = getCarDetails(url);
+      getCarDetails(url);
     }
 });
 
@@ -29,6 +32,7 @@ function getCarDetails(url){
   request(OPTIONS, function(err,res,body){
     var $ = cheerio.load(body);
     var car = {
+        url: OPTIONS.url,
         color: $('[data-qaid="cntnr-exteriorColor"]').text(),
         price: $('[data-qaid="cntnr-pricing-cmp-outer"]').text(),
         vin: $('[data-qaid="tbl-value-VIN"]').text(),
@@ -37,8 +41,9 @@ function getCarDetails(url){
         phone: $('[data-qaid="dlr_phone"]').text(),
         pic: $('.media-viewer img').attr('src')
     };
-    //now store the car to the DB
-    
+    console.log(car);
+    //now store the car to the DB, checking by VIN for repeats
+
   });
 
 }
