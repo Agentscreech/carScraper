@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>CAR LIST</title>
-        <base href="/">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.2/angular-ui-router.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet" crossorigin="anonymous">
-        <script src="app/app.js" charset="utf-8"></script>
 
-    </head>
-    <body ng-app="App">
-        <p>angular is working if this is 2.  {{1+1}}</p>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <title>CAR LIST</title>
+    <base href="/">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.0-rc.1/angular-ui-router.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- local angular items -->
+    <script src="app/app.js" charset="utf-8"></script>
+    <script src="app/containers/home/home.js" charset="utf-8"></script>
+    <script src="app/services/services.js" charset="utf-8"></script>
+
+</head>
+
+<body ng-app="App">
+    <p>angular is working if this is 2. {{1+1}} ui views rendered under this</p>
+    <div ui-view></div>
+</body>
+
 </html>

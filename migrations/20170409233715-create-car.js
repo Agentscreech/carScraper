@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       url: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(1000)
       },
       price: {
         type: Sequelize.STRING
@@ -34,6 +34,10 @@ module.exports = {
       },
       pic: {
         type: Sequelize.STRING
+      },
+      archived: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

@@ -4,16 +4,97 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var request = require('request');
 var app = express();
+var cheerio = require('cheerio');
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 
 app.use(express.static(path.join(__dirname + '/static/')));
+
+app.get('/api/cars/all', function(req, res) {
+    db.car.findAll().then(function(cars) {
+        res.send(cars);
+    });
+});
+
+app.put('/api/cars/archive/:id', function(req, res) {
+    db.car.findOne({
+        where: {
+            id: req.params.id
+        }
+    }).then(function(car) {
+        car.update({
+            archived: true
+        });
+    }).then(function(car) {
+        res.sendStatus(200);
+    });
+});
+
+app.get('/api/updateList', function(req, res) {
+    var OPTIONS = {
+        url: 'http://www.autotrader.com/cars-for-sale/2017/Ford/Mustang/Lynnwood+WA-98036?zip=98036&extColorsSimple=BLUE&startYear=2017&numRecords=100&incremental=all&endYear=2017&modelCodeList=MUST&makeCodeList=FORD&sortBy=distanceASC&firstRecord=0&searchRadius=1200&trimCodeList=MUST%7CShelby%20GT350',
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+        }
+
+    };
+
+    //grab the search results and then send each listed URL to the function that grabs the data we want.
+    request(OPTIONS, function(err, response, body) {
+        // console.log(body);
+        var $ = cheerio.load(body);
+        var results = $('a[data-qaid="lnk-lstgTtlf"]');
+        //could be rewritten as results.each(function(index, result))
+        for (var i = 0; i < results.length; i++) {
+            var url = "http://www.autotrader.com/" + results[i].attribs.href;
+            getCarDetails(url);
+        }
+    });
+
+
+    //
+    function getCarDetails(url) {
+        OPTIONS.url = url;
+        request(OPTIONS, function(err, res, body) {
+            var $ = cheerio.load(body);
+            var car = {
+                name: $('[data-qaid="cntnr-vehicle-title-header"] [title]').text(),
+                url: OPTIONS.url,
+                color: $('[data-qaid="cntnr-exteriorColor"]').text(),
+                price: $('[data-qaid="cntnr-pricing-cmp-outer"]').text(),
+                vin: $('[data-qaid="tbl-value-VIN"]').text(),
+                dealer: $('[data-qaid="dealer_name"]').text(),
+                address: $('[itemprop="address"]').text(),
+                phone: $('[data-qaid="dlr_phone"]').text(),
+                pic: $('.media-viewer img').attr('src')
+            };
+            console.log(car);
+            //now store the car to the DB, checking by VIN for repeats
+            db.car.findOrCreate({
+                where: {
+                    name: car.name,
+                    vin: car.vin,
+                    url: car.url,
+                    color: car.color,
+                    price: car.price,
+                    dealer: car.dealer,
+                    address: car.address,
+                    phone: car.phone,
+                    pic: car.pic
+                }
+            });
+        });
+
+    }
+});
 
 
 //root route and server port
 app.get('/*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'static/index.html'));
+    res.sendFile(path.join(__dirname, 'static/index.html'));
 });
-var server = app.listen((process.env.PORT || 1337), function(){
-  console.log('listening on 1337');
+var server = app.listen((process.env.PORT || 1337), function() {
+    console.log('listening on 1337');
 });

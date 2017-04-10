@@ -1,6 +1,6 @@
 var request = require('request');
 var cheerio = require('cheerio');
-var mongoose = require('mongoose');
+var db = require('./models');
 
 
 //URL for the cars we want to look for.
@@ -32,6 +32,7 @@ function getCarDetails(url){
   request(OPTIONS, function(err,res,body){
     var $ = cheerio.load(body);
     var car = {
+        name: $('[data-qaid="cntnr-vehicle-title-header"] [title]').text(),
         url: OPTIONS.url,
         color: $('[data-qaid="cntnr-exteriorColor"]').text(),
         price: $('[data-qaid="cntnr-pricing-cmp-outer"]').text(),
@@ -43,17 +44,22 @@ function getCarDetails(url){
     };
     console.log(car);
     //now store the car to the DB, checking by VIN for repeats
-
+    db.car.findOrCreate({
+      where: {
+        name: car.name,
+        vin:car.vin,
+        url:car.url,
+        color: car.color,
+        price: car.price,
+        dealer: car.dealer,
+        address: car.address,
+        phone: car.phone,
+        pic: car.pic
+      }
+    });
   });
 
 }
-//once rendered, filter it and scrape what you want
-
-
-//this gets the links to all the results in array test[0].href is the link
-// var cars = document.querySelectorAll("a[data-qaid='lnk-lstgTtlf']");
-
-//once you get the response from the individual car, you can get all the info we need from it like this.
 
 
 

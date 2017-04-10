@@ -1,0 +1,22 @@
+<h1>This is the Home container</h1>
+
+<button class="btn btn-success" ng-click="homeComp.update()">UPDATE LIST</button>
+
+<!-- need to have an ng-repeat to display all the cars here -->
+<div ng-repeat="car in homeComp.cars">
+    <div ng-if="car.archived == false">
+        <div class="well" id="{{car.id}}">
+            <img ng-src="{{car.pic}}">
+            <p>{{car.name}} <span><button class="btn btn-danger" ng-click="homeComp.archive(car.id)">archive</button></p>
+                <p>Color: {{car.color}}</p>
+                <p>Price: {{car.price}}</p>
+                <p>Dealer: {{car.dealer}}</p>
+                <p>address: {{car.address}}</p>
+                <p>phone: {{car.phone}}</p>
+                <p>vin: {{car.vin}}</p>
+                <p>PDF TO BE SHOWN HERE</p>
+                <!-- <embed src="'/> -->
+
+            </div>
+        </div>
+</div>
