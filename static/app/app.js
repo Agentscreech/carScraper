@@ -1,4 +1,4 @@
-angular.module('App', ['ui.router'])
+angular.module('App', ['ui.router','pdf'])
 .config([
   '$stateProvider',
   '$urlRouterProvider',

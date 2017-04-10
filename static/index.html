@@ -5,9 +5,14 @@
     <meta charset="utf-8">
     <title>CAR LIST</title>
     <base href="/">
+
+    <!-- cdn and other dependencies  -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.0-rc.1/angular-ui-router.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/149125/pdf.combined.js" charset="utf-8"></script>
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/149125/angular-pdf-viewer.min.js" charset="utf-8"></script>
 
     <!-- local angular items -->
     <script src="app/app.js" charset="utf-8"></script>
@@ -17,8 +22,11 @@
 </head>
 
 <body ng-app="App">
-    <p>angular is working if this is 2. {{1+1}} ui views rendered under this</p>
-    <div ui-view></div>
+    <div class="container">
+        <p>angular is working if this is 2. {{1+1}} ui views rendered under this</p>
+        <div ui-view></div>
+
+    </div>
 </body>
 
 </html>

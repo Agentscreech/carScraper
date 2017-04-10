@@ -5,12 +5,16 @@ angular.module('App')
         controllerAs: 'homeComp'
     });
 
-function HomeCompCtrl($scope,CarList) {
+function HomeCompCtrl($scope,CarList,pdfDelegate) {
     var homeComp = this;
     homeComp.cars = "";
     //get a list of the cars
     CarList.getCars().then(function(res){
         homeComp.cars = res;
+        homeComp.cars.forEach(function(car){
+            car.pdf = "http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin;
+            car.show = false;
+        });
     });
     homeComp.archive = function(id){
         //flag the car to be archived and not displayed.
@@ -26,4 +30,4 @@ function HomeCompCtrl($scope,CarList) {
     };
 }
 
-HomeCompCtrl.$inject = ['$scope','CarList'];
+HomeCompCtrl.$inject = ['$scope','CarList','pdfDelegate'];

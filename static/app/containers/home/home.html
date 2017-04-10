@@ -7,14 +7,17 @@
     <div ng-if="car.archived == false">
         <div class="well" id="{{car.id}}">
             <img ng-src="{{car.pic}}">
-            <p>{{car.name}} <span><button class="btn btn-danger" ng-click="homeComp.archive(car.id)">archive</button></p>
+            <p>{{car.name}} <span><button class="btn btn-danger" ng-click="homeComp.archive(car.id)">archive</button></span></p>
                 <p>Color: {{car.color}}</p>
                 <p>Price: {{car.price}}</p>
                 <p>Dealer: {{car.dealer}}</p>
                 <p>address: {{car.address}}</p>
                 <p>phone: {{car.phone}}</p>
                 <p>vin: {{car.vin}}</p>
-                <p>PDF TO BE SHOWN HERE</p>
+                Show PDF: <input type="checkbox" ng-model="car.show">
+                <div class="pdf" ng-show="car.show">
+                    <pdf-viewer delegate-handle="my-pdf-container" url="car.pdf" scale="1"></pdf-viewer>
+                </div>
                 <!-- <embed src="'/> -->
 
             </div>
