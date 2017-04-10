@@ -35,6 +35,9 @@ module.exports = {
       pic: {
         type: Sequelize.STRING
       },
+      dist: {
+          type: Sequelize.STRING
+      },
       archived: {
         type: Sequelize.BOOLEAN,
         defaultValue: false

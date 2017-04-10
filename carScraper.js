@@ -18,16 +18,17 @@ request(OPTIONS, function(err, response, body){
     // console.log(body);
     var $ = cheerio.load(body);
     var results = $('a[data-qaid="lnk-lstgTtlf"]');
+    var dist = $('data-qaid="cntnr-dlrlstng-radius"]');
     //could be rewritten as results.each(function(index, result))
     for (var i = 0; i<results.length; i++){
       var url = "http://www.autotrader.com/"+results[i].attribs.href;
-      getCarDetails(url);
+      getCarDetails(url, dist);
     }
 });
 
 
 //
-function getCarDetails(url){
+function getCarDetails(url,dist){
   OPTIONS.url = url;
   request(OPTIONS, function(err,res,body){
     var $ = cheerio.load(body);
@@ -40,7 +41,8 @@ function getCarDetails(url){
         dealer: $('[data-qaid="dealer_name"]').text(),
         address: $('[itemprop="address"]').text(),
         phone: $('[data-qaid="dlr_phone"]').text(),
-        pic: $('.media-viewer img').attr('src')
+        pic: $('.media-viewer img').attr('src'),
+        dist: dist
     };
     console.log(car);
     //now store the car to the DB, checking by VIN for repeats

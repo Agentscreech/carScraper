@@ -10,6 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     phone: DataTypes.STRING,
     color: DataTypes.STRING,
     pic: DataTypes.STRING,
+    dist: DataTypes.STRING,
     archived: DataTypes.BOOLEAN
   }, {
     classMethods: {
