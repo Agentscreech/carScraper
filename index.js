@@ -51,11 +51,14 @@ app.get('/api/updateList', function(req, res) {
         for (var i = 0; i < results.length; i++) {
             var url = "http://www.autotrader.com/" + results[i].attribs.href;
             getCarDetails(OPTIONS,url,dist[i].children[0].data,function(car){
-                updateDB(car, OPTIONS);
+                updateDB(car);
+
             });
         }
         res.sendStatus(200);
     });
+    //now to clean up any expired listings
+    deleteExpiredListings();
 
 
 
@@ -94,13 +97,12 @@ function getCarDetails(OPTIONS,url,dist,callback) {
 
 }
 
-function updateDB(car, options){
+function updateDB(car){
     db.car.find({
         where: {
             vin: car.vin
         }
     }).then(function(result){
-        console.log(car.price, result.price);
         if (!result){
             console.log("adding new car");
             db.car.create({
@@ -125,5 +127,28 @@ function updateDB(car, options){
             }
         }
         return false;
+    });
+}
+
+function deleteExpiredListings(){
+    db.car.findAll().then(function(cars){
+        cars.forEach(function(car){
+            var url = car.dataValues.url
+            var options = {
+                url: url,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+                }
+            }
+            request(options, function(err, res, body){
+                var $ = cheerio.load(body);
+                var test = $('[data-qaid="cntnr-vehicle-title-header"] [title]').text();
+                // console.log("!!!! TESTING ID ",car.id,test)
+                if (!test){
+                    console.log("should be deleted", car.id)
+                    db.car.destroy({where: {url: car.url}})
+                }
+            });
+        })
     });
 }
