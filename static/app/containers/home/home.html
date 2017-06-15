@@ -7,7 +7,7 @@
     <div ng-if="car.archived == false">
         <div class="well" id="{{car.id}}">
             <img ng-src="{{car.pic}}">
-            <a href="{{car.url}}">{{car.name}}</a>
+            <a href="{{car.url}}" target="_blank">{{car.name}}</a>
             <button class="btn btn-danger" ng-click="homeComp.archive(car.id)">archive</button>
                 <p>{{car.dist}}</p>
                 <p>Color: {{car.color}}</p>

@@ -43,54 +43,22 @@ app.get('/api/updateList', function(req, res) {
 
     //grab the search results and then send each listed URL to the function that grabs the data we want.
     request(OPTIONS, function(err, response, body) {
-        // console.log(body);
         var $ = cheerio.load(body);
         var results = $('a[data-qaid="lnk-lstgTtlf"]');
         var dist = $('[data-qaid="cntnr-dlrlstng-radius"]');
         //could be rewritten as results.each(function(index, result))
+        console.log("found "+results.length);
         for (var i = 0; i < results.length; i++) {
             var url = "http://www.autotrader.com/" + results[i].attribs.href;
-            getCarDetails(url,dist[i].children[0].data);
+            getCarDetails(OPTIONS,url,dist[i].children[0].data,function(car){
+                updateDB(car, OPTIONS);
+            });
         }
         res.sendStatus(200);
     });
 
 
-    //
-    function getCarDetails(url,dist) {
-        OPTIONS.url = url;
-        request(OPTIONS, function(err, res, body) {
-            var $ = cheerio.load(body);
-            var car = {
-                name: $('[data-qaid="cntnr-vehicle-title-header"] [title]').text(),
-                url: OPTIONS.url,
-                color: $('[data-qaid="cntnr-exteriorColor"]').text(),
-                price: $('[data-qaid="cntnr-pricing-cmp-outer"]').text(),
-                vin: $('[data-qaid="tbl-value-VIN"]').text(),
-                dealer: $('[data-qaid="dealer_name"]').text(),
-                address: $('[itemprop="address"]').text(),
-                phone: $('[data-qaid="dlr_phone"]').text(),
-                pic: $('.media-viewer img').attr('src'),
-                dist: dist
-            };
-            //now store the car to the DB, checking by VIN for repeats
-            db.car.findOrCreate({
-                where: {
-                    name: car.name,
-                    vin: car.vin,
-                    url: car.url,
-                    color: car.color,
-                    price: car.price,
-                    dealer: car.dealer,
-                    address: car.address,
-                    phone: car.phone,
-                    pic: car.pic,
-                    dist: car.dist
-                }
-            });
-        });
 
-    }
 });
 
 
@@ -101,3 +69,61 @@ app.get('/*', function(req, res) {
 var server = app.listen((process.env.PORT || 1337), function() {
     console.log('listening on 1337');
 });
+
+
+//helper functions
+
+function getCarDetails(OPTIONS,url,dist,callback) {
+    OPTIONS.url = url;
+    request(OPTIONS, function(err, res, body) {
+        var $ = cheerio.load(body);
+        var car = {
+            name: $('[data-qaid="cntnr-vehicle-title-header"] [title]').text(),
+            url: url,
+            color: $('[data-qaid="cntnr-exteriorColor"]').text(),
+            price: $('[data-qaid="cntnr-pricing-cmp-outer"]').text(),
+            vin: $('[data-qaid="tbl-value-VIN"]').text(),
+            dealer: $('[data-qaid="dealer_name"]').text(),
+            address: $('[itemprop="address"]').text(),
+            phone: $('[data-qaid="dlr_phone"]').text(),
+            pic: $('.media-viewer img').attr('src'),
+            dist: dist
+        }
+        callback(car);
+    });
+
+}
+
+function updateDB(car, options){
+    db.car.find({
+        where: {
+            vin: car.vin
+        }
+    }).then(function(result){
+        console.log(car.price, result.price);
+        if (!result){
+            console.log("adding new car");
+            db.car.create({
+                name: car.name,
+                vin: car.vin,
+                url: car.url,
+                color: car.color,
+                price: car.price,
+                dealer: car.dealer,
+                address: car.address,
+                phone: car.phone,
+                pic: car.pic,
+                dist: car.dist
+            });
+        } else {
+            //update the listing
+            if (car.price != result.price){
+                console.log("updating price");
+                db.car.update({
+                    price: car.price
+                },{where: {vin: car.vin}});
+            }
+        }
+        return false;
+    });
+}
