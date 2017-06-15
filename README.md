@@ -1,5 +1,5 @@
 # carScraper
-The is a web scraper that scrapes AutoTrader for a very specific type of car.
+This is a web scraper that scrapes AutoTrader for a very specific type of car.
 
 It grabs the results, then scrapes the results to get the details of the car. 
 
