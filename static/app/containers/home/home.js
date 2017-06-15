@@ -10,6 +10,11 @@ function HomeCompCtrl($scope,$window,CarList,pdfDelegate) {
     homeComp.cars = "";
     //get a list of the cars
     CarList.getCars().then(function(res){
+        //sort by distance closest first.
+        res.sort(function(a,b){
+            var shorter = a.dist.split(" "), longer = b.dist.split(" ")
+            return parseInt(shorter[0]) > parseInt(longer[0]) ? 1 : parseInt(shorter[0]) < parseInt(longer[0]) ? -1 : 0;
+        })
         homeComp.cars = res;
         homeComp.cars.forEach(function(car){
             car.pdf = "http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin;
