@@ -142,9 +142,8 @@ function deleteExpiredListings(){
             }
             request(options, function(err, res, body){
                 var $ = cheerio.load(body);
-                var test = $('[data-qaid="cntnr-vehicle-title-header"] [title]').text();
                 // console.log("!!!! TESTING ID ",car.id,test)
-                if (!test){
+                if (!$('[data-qaid="cntnr-vehicle-title-header"] [title]').text()){
                     console.log("should be deleted", car.id)
                     db.car.destroy({where: {url: car.url}})
                 }
