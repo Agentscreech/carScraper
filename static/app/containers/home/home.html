@@ -18,7 +18,10 @@
                 <p>vin: {{car.vin}}</p>
                 Show PDF: <input type="checkbox" ng-model="car.showPdf">
                 <div class="pdf" ng-show="car.showPdf">
-                    <pdf-viewer delegate-handle="my-pdf-container" url="car.pdf" scale="1"></pdf-viewer>
+                    <iframe ng-src="{{car.pdf}}" align="middle" width="100%" height="700" frameborder="0">
+                        <p>Your browser does not support iframes.</p>
+                    </iframe>
+                    <!-- <pdf-viewer delegate-handle="my-pdf-container" url="car.pdf" scale="1"></pdf-viewer> -->
                 </div>
                 <!-- <embed src="'/> -->
 

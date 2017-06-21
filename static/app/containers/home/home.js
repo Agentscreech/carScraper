@@ -5,7 +5,7 @@ angular.module('App')
         controllerAs: 'homeComp'
     });
 
-function HomeCompCtrl($scope,$window,CarList,pdfDelegate) {
+function HomeCompCtrl($scope,$window,CarList,$sce) {
     var homeComp = this;
     homeComp.cars = "";
     //get a list of the cars
@@ -15,7 +15,7 @@ function HomeCompCtrl($scope,$window,CarList,pdfDelegate) {
 
         // homeComp.cars = res;
         homeComp.cars.forEach(function(car){
-            car.pdf = "http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin;
+            car.pdf = $sce.trustAsResourceUrl("http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin);
             car.showPdf = false;
         });
     });
@@ -55,7 +55,8 @@ function rankCars(cars){
             var arr1 = a.price.split("$"), arr2 = b.price.split("$");
             if (arr1 == ""){
                 arr1 = ["","999,999"]
-            } else if (arr2 == ""){
+            }
+            if (arr2 == ""){
                 arr2 = ["","999,999"]
             }
             return parseInt(arr1[1].split(",").join("")) > parseInt(arr2[1].split(",").join("")) ? 1 : parseInt(arr1[1].split(",").join("")) < parseInt(arr2[1].split(",").join("")) ? -1 : 0;
@@ -76,4 +77,4 @@ function rankCars(cars){
     return cars
 }
 
-HomeCompCtrl.$inject = ['$scope','$window','CarList','pdfDelegate'];
+HomeCompCtrl.$inject = ['$scope','$window','CarList','$sce'];
