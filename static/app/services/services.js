@@ -33,5 +33,5 @@ angular.module('App')
                 console.log('updating list');
                 return $http(req);
             }
-        };
+        }
     }])

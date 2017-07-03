@@ -8,17 +8,7 @@ angular.module('App')
 function HomeCompCtrl($scope,$window,CarList,$sce) {
     var homeComp = this;
     homeComp.cars = "";
-    //get a list of the cars
-    CarList.getCars().then(function(res){
-        //rank cars by price and distance
-        homeComp.cars = rankCars(res);
 
-        // homeComp.cars = res;
-        homeComp.cars.forEach(function(car){
-            car.pdf = $sce.trustAsResourceUrl("http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin);
-            car.showPdf = false;
-        });
-    });
     homeComp.archive = function(id){
         //flag the car to be archived and not displayed.
         console.log('tried to archive car with id ', id);
@@ -32,6 +22,15 @@ function HomeCompCtrl($scope,$window,CarList,$sce) {
             $window.location.reload();
         });
     };
+    //get a list of the cars
+    CarList.getCars().then(function(res){
+        //rank cars by price and distance
+        homeComp.cars = rankCars(res);;
+        homeComp.cars.forEach(function(car){
+            car.pdf = $sce.trustAsResourceUrl("http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin);
+            car.showPdf = false;
+        });
+    });
 }
 //sorting helper
 function rankCars(cars){
@@ -48,9 +47,7 @@ function rankCars(cars){
             return -1
         }
         return 0
-        // return aa < bb ? 1 : aa > bb ? -1 : 0;
     });
-    // console.log("distance ",carsByDistance);
     var carsByPrice = cars.sort(function(a,b){
             var arr1 = a.price.split("$"), arr2 = b.price.split("$");
             if (arr1 == ""){
@@ -62,18 +59,14 @@ function rankCars(cars){
             return parseInt(arr1[1].split(",").join("")) > parseInt(arr2[1].split(",").join("")) ? 1 : parseInt(arr1[1].split(",").join("")) < parseInt(arr2[1].split(",").join("")) ? -1 : 0;
 
     });
-    // console.log(carsByPrice);
     //for each car, find the index of it in each of the arrays then add them and manually create a new array with the new index.
     cars.forEach(function(car){
         var rank = carsByDistance.indexOf(car) + carsByPrice.indexOf(car) - 1;
-        // console.log("Car with price " +car.price+" and distance of "+car.dist+" has a rank of "+rank);
         car.rank = rank;
     });
     cars.sort(function(a,b){
         return a.rank-b.rank;
     });
-    // rankedList = rankedList.filter(Boolean);
-    // return rankedList;
     return cars
 }
 

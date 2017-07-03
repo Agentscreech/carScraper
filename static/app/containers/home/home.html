@@ -1,8 +1,8 @@
 <h1>Your list of Ford Mustang GT350's</h1>
 
-<button class="btn btn-success" ng-click="homeComp.update()">UPDATE LIST</button>
+<button class="btn btn-success" ng-click="homeComp.update()">START AUTO-UPDATE</button>
 
-<!-- need to have an ng-repeat to display all the cars here -->
+
 <div ng-repeat="car in homeComp.cars">
     <div ng-if="car.archived == false">
         <div class="well" id="{{car.id}}">
@@ -16,14 +16,12 @@
                 <p>address: {{car.address}}</p>
                 <p>phone: {{car.phone}}</p>
                 <p>vin: {{car.vin}}</p>
-                Show PDF: <input type="checkbox" ng-model="car.showPdf">
+                <!-- Show PDF: <input type="checkbox" ng-model="car.showPdf">
                 <div class="pdf" ng-show="car.showPdf">
                     <iframe ng-src="{{car.pdf}}" align="middle" width="100%" height="700" frameborder="0">
                         <p>Your browser does not support iframes.</p>
-                    </iframe>
-                    <!-- <pdf-viewer delegate-handle="my-pdf-container" url="car.pdf" scale="1"></pdf-viewer> -->
+                    </iframe> -->
                 </div>
-                <!-- <embed src="'/> -->
 
             </div>
         </div>
