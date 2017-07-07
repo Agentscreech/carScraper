@@ -1,6 +1,7 @@
 <h1>Your list of Ford Mustang GT350's</h1>
 
-<button class="btn btn-success" ng-click="homeComp.update()">START AUTO-UPDATE</button>
+<button class="btn btn-danger" ng-if="homeComp.updaterStatus" ng-click="homeComp.update()">STOP AUTO-UPDATE</button>
+<button class="btn btn-success" ng-if="!homeComp.updaterStatus" ng-click="homeComp.update()">START AUTO-UPDATE</button>
 
 
 <div ng-repeat="car in homeComp.cars">

@@ -8,7 +8,7 @@ var app = express();
 var cheerio = require('cheerio');
 var nodemailer = require('nodemailer');
 var request = require('request-promise');
-
+var updaterInterval;
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname + '/static/')));
 
 app.get('/api/cars/all', function(req, res) {
     db.car.findAll().then(function(cars) {
-        res.send(cars);
+        res.send({cars: cars,updaterStatus: Boolean(updaterInterval)});
     });
 });
 
@@ -37,10 +37,16 @@ app.put('/api/cars/archive/:id', function(req, res) {
 });
 
 app.get('/api/updateList', function(req, res) {
-    console.log("starting update on backend")
-    updateList();
-    setInterval(updateList, 60 * 60 * 1000);
-    res.sendStatus(200);
+        if (updaterInterval){
+            console.log("clearing updater");
+            clearInterval(updaterInterval)
+            updaterInterval = null;
+        } else {
+            console.log("starting updater")
+            updateList();
+            updaterInterval = setInterval(updateList, 60 * 60 * 1000);
+        }
+        res.redirect('/api/cars/all')
 });
 
 //root route and server port
@@ -57,20 +63,20 @@ var server = app.listen((process.env.PORT || 1337), function() {
 //helper functions
 
 function updateList() {
-    console.log("interval firing")
-    var OPTIONS = {
-        url: 'http://www.autotrader.com/cars-for-sale/2017/Ford/Mustang/Lynnwood+WA-98036?zip=98036&extColorsSimple=BLUE&startYear=2017&numRecords=100&incremental=all&endYear=2017&modelCodeList=MUST&makeCodeList=FORD&sortBy=distanceASC&firstRecord=0&searchRadius=1200&trimCodeList=MUST%7CShelby%20GT350',
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-        }
+    return new Promise(function(resolve, reject){
+        var OPTIONS = {
+            url: 'http://www.autotrader.com/cars-for-sale/2017/Ford/Mustang/Lynnwood+WA-98036?zip=98036&extColorsSimple=BLUE&startYear=2017&numRecords=100&incremental=all&endYear=2017&modelCodeList=MUST&makeCodeList=FORD&sortBy=distanceASC&firstRecord=0&searchRadius=1200&trimCodeList=MUST%7CShelby%20GT350',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+            }
 
-    };
-    var newCarsListed = [];
-    var url = ""
-    var distance = ""
-    //grab the search results and then send each listed URL to the function that grabs the data we want.
-    request(OPTIONS).then(function(body) {
-        var carsScraped = [];
+        };
+        var newCarsListed = [];
+        var url = ""
+        var distance = ""
+        //grab the search results and then send each listed URL to the function that grabs the data we want.
+        request(OPTIONS).then(function(body) {
+            var carsScraped = [];
             if (body) {
                 var $ = cheerio.load(body);
                 var results = $('a[data-qaid="lnk-lstgTtlf"]');
@@ -80,26 +86,22 @@ function updateList() {
                     url = "http://www.autotrader.com/" + results[i].attribs.href;
                     distance = dist[i].children[0].data;
                     carsScraped.push([url, distance]);
-                    }
+                }
             };
             console.log("parsed ", carsScraped.length, " cars")
             return carsScraped
             // deleteExpiredListings();
         }).then(function(cars){
-            console.log("request is done, going to first promise");
             var counter = 0;
             cars.forEach(function(singleCar){
                 url = singleCar[0]
                 distance = singleCar[1]
                 getCarDetails(OPTIONS, url, distance).then(function(carDetails){
-                    console.log("getDetails done, firing update")
                     updateDB(carDetails).then(function(carUpdated){
-                        console.log("update promise should be done")
                         if(carUpdated){
                             newCarsListed.push(carUpdated);
                         }
                         counter++
-                        console.log("checking counter", counter)
                         if (counter == cars.length){
                             console.log("everything is updated at,", timeStamp()," checking is newCarsListed has anything");
                             if (newCarsListed.length > 0) {
@@ -109,7 +111,8 @@ function updateList() {
                             } else {
                                 console.log("no new cars to email")
                             }
-                            // deleteExpiredListings();
+                            deleteExpiredListings();
+                            resolve();
                         }
                     })
                 })
@@ -117,6 +120,8 @@ function updateList() {
         }).catch(function(error){
             console.log("something went wrong", error.message)
         })
+
+    })
 }
 
 
@@ -207,8 +212,6 @@ function deleteExpiredListings() {
                                 url: car.url
                             }
                         })
-                    } else {
-                        console.log("url still works")
                     }
                 } else {
                     console.log("delete check didn't return anything valid");
@@ -242,7 +245,7 @@ function sendEmail(cars) {
         from: 'yourComputer@mac.com',
         to: 'exoticimage@hotmail.com',
         subject: 'New GT350 found!',
-        text: 'There is a new car found!.  Check the site!'
+        text: 'There is a new car found!.'
     };
 
     transporter.sendMail(mailOptions, function(error, info) {

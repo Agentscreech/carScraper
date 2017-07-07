@@ -25,7 +25,8 @@ function HomeCompCtrl($scope,$window,CarList,$sce) {
     //get a list of the cars
     CarList.getCars().then(function(res){
         //rank cars by price and distance
-        homeComp.cars = rankCars(res);;
+        homeComp.updaterStatus = res.updaterStatus;
+        homeComp.cars = rankCars(res.cars);
         homeComp.cars.forEach(function(car){
             car.pdf = $sce.trustAsResourceUrl("http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin);
             car.showPdf = false;

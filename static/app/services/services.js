@@ -7,7 +7,6 @@ angular.module('App')
                     url: '/api/cars/all',
                     method: "GET"
                 };
-                console.log("getting carList from service");
                 return $http(req).then(function(res) {
                     if (res.data === undefined) {
                         list = null;
