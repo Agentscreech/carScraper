@@ -26,6 +26,7 @@ function HomeCompCtrl($scope,$window,CarList,$sce) {
     CarList.getCars().then(function(res){
         //rank cars by price and distance
         homeComp.updaterStatus = res.updaterStatus;
+        console.log(homeComp.updaterStatus)
         homeComp.cars = rankCars(res.cars);
         homeComp.cars.forEach(function(car){
             car.pdf = $sce.trustAsResourceUrl("http://www.windowsticker.forddirect.com/windowsticker.pdf?vin="+car.vin);
@@ -62,11 +63,12 @@ function rankCars(cars){
             return parseInt(arr1[1].split(",").join(""))+parseInt(weight1[0]) > parseInt(arr2[1].split(",").join(""))+parseInt(weight2[0]) ? 1 : parseInt(arr1[1].split(",").join(""))+parseInt(weight1[0]) < parseInt(arr2[1].split(",").join(""))+parseInt(weight2[0]) ? -1 : 0;
 
     });
-    //for each car, find the index of it in each of the arrays then add them and manually create a new array with the new index.
+    //for each car, find the index of it in each of the arrays then add them.  Set that to a rank property
     cars.forEach(function(car){
         var rank = carsByDistance.indexOf(car) + carsByPrice.indexOf(car) - 1;
         car.rank = rank;
     });
+    //now sort by that new rank
     cars.sort(function(a,b){
         return a.rank-b.rank;
     });

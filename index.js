@@ -42,11 +42,11 @@ app.get('/api/updateList', function(req, res) {
             clearInterval(updaterInterval)
             updaterInterval = null;
         } else {
-            console.log("starting updater")
-            updateList();
+            console.log("starting updater");
             updaterInterval = setInterval(updateList, 60 * 60 * 1000);
+            updateList();
         }
-        res.redirect('/api/cars/all')
+        res.sendStatus(200)
 });
 
 //root route and server port
@@ -83,33 +83,32 @@ function updateList() {
                 var dist = $('[data-qaid="cntnr-dlrlstng-radius"]');
                 console.log("found " + results.length);
                 for (var i = 0; i < results.length; i++) {
-                    url = "http://www.autotrader.com/" + results[i].attribs.href;
+                    url = "http://www.autotrader.com" + results[i].attribs.href;
                     distance = dist[i].children[0].data;
                     carsScraped.push([url, distance]);
                 }
             };
             console.log("parsed ", carsScraped.length, " cars")
-            return carsScraped
-            // deleteExpiredListings();
+            return carsScraped;
         }).then(function(cars){
             var counter = 0;
             cars.forEach(function(singleCar){
-                url = singleCar[0]
-                distance = singleCar[1]
+                url = singleCar[0];
+                distance = singleCar[1];
                 getCarDetails(OPTIONS, url, distance).then(function(carDetails){
                     updateDB(carDetails).then(function(carUpdated){
                         if(carUpdated){
                             newCarsListed.push(carUpdated);
                         }
-                        counter++
+                        counter++;
                         if (counter == cars.length){
                             console.log("everything is updated at,", timeStamp()," checking is newCarsListed has anything");
                             if (newCarsListed.length > 0) {
                                 //send email with new cars
                                 console.log("new car(s) found, should send email with ", newCarsListed);
-                                // sendEmail(newCarsListed);
+                                sendEmail(newCarsListed);
                             } else {
-                                console.log("no new cars to email")
+                                console.log("no new cars to email");
                             }
                             deleteExpiredListings();
                             resolve();
@@ -118,7 +117,7 @@ function updateList() {
                 })
             })
         }).catch(function(error){
-            console.log("something went wrong", error.message)
+            console.log("something went wrong", error.message);
         })
 
     })
@@ -148,7 +147,7 @@ function getCarDetails(OPTIONS, url, dist) {
             if (car)
                 resolve(car);
             });
-    })
+    });
 }
 
 function updateDB(car) {
@@ -189,13 +188,13 @@ function updateDB(car) {
             }
 
         });
-    })
+    });
 }
 
 function deleteExpiredListings() {
     db.car.findAll().then(function(cars) {
         cars.forEach(function(car) {
-            var url = car.dataValues.url
+            var url = car.dataValues.url;
             var options = {
                 url: url,
                 headers: {
@@ -206,7 +205,7 @@ function deleteExpiredListings() {
                 if (body) {
                     var $ = cheerio.load(body);
                     if (!$('[data-qaid="cntnr-vehicle-title-header"] [title]').text()) {
-                        console.log('removing url', car.url)
+                        console.log('removing url', car.url);
                         db.car.destroy({
                             where: {
                                 url: car.url
@@ -217,7 +216,7 @@ function deleteExpiredListings() {
                     console.log("delete check didn't return anything valid");
                 }
             }).catch(function(err){
-                console.log(err.body, "happend",'removing url', car.url)
+                console.log(err.body, "happend",'removing url', car.url);
                 db.car.destroy({
                     where: {
                         url: car.url
@@ -232,7 +231,7 @@ function deleteExpiredListings() {
 //email setup
 
 function sendEmail(cars) {
-
+    console.log("here are what the emailer was passed", cars);
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -248,13 +247,14 @@ function sendEmail(cars) {
         text: 'There is a new car found!.'
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
+    var emailStatus = transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
-            console.log(error);
+            return console.log(error);
         } else {
-            console.log('Email sent: ' + info.response);
+            return console.log('Email sent: ' + info.response);
         }
     });
+    return emailStatus;
 }
 
 
