@@ -49,15 +49,17 @@ function rankCars(cars){
         }
         return 0
     });
-    var carsByPrice = cars.sort(function(a,b){
+    //Add the distance @ $1/mile to the price then sort it.  That would weight the distance more since you'll have pay to travel to the location.
+    var carsByPrice = cars.slice(0).sort(function(a,b){
             var arr1 = a.price.split("$"), arr2 = b.price.split("$");
+            var weight1 = a.dist.split(" "), weight2 = b.dist.split(" ")
             if (arr1 == ""){
                 arr1 = ["","999,999"]
             }
             if (arr2 == ""){
                 arr2 = ["","999,999"]
             }
-            return parseInt(arr1[1].split(",").join("")) > parseInt(arr2[1].split(",").join("")) ? 1 : parseInt(arr1[1].split(",").join("")) < parseInt(arr2[1].split(",").join("")) ? -1 : 0;
+            return parseInt(arr1[1].split(",").join(""))+parseInt(weight1[0]) > parseInt(arr2[1].split(",").join(""))+parseInt(weight2[0]) ? 1 : parseInt(arr1[1].split(",").join(""))+parseInt(weight1[0]) < parseInt(arr2[1].split(",").join(""))+parseInt(weight2[0]) ? -1 : 0;
 
     });
     //for each car, find the index of it in each of the arrays then add them and manually create a new array with the new index.
