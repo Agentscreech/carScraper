@@ -1,6 +1,5 @@
+require('dotenv').config();
 var db = require('./models');
-// var Promise = require('bluebird');
-// var request = Promise.promisifyAll(require("request"));
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
@@ -8,6 +7,7 @@ var app = express();
 var cheerio = require('cheerio');
 var nodemailer = require('nodemailer');
 var request = require('request-promise');
+
 var updaterInterval;
 
 app.use(bodyParser.urlencoded({
@@ -106,6 +106,7 @@ function updateList() {
                             if (newCarsListed.length > 0) {
                                 //send email with new cars
                                 console.log("new car(s) found, should send email with ", newCarsListed);
+                                // send_simple_message();
                                 sendEmail(newCarsListed);
                             } else {
                                 console.log("no new cars to email");
@@ -230,10 +231,21 @@ function deleteExpiredListings() {
 
 //email setup
 
+function send_simple_message(){
+    return requests.post(
+        "https://api.mailgun.net/v3/sandbox997eaaf4769941fc91309819e6e40bf3.mailgun.org",
+        auth=("api", process.env.EMAIL_API),
+        data={"from": "The Bot <you@carscraper.com>",
+        "to": ["Me", "exoticimage@hotmail.com"],
+        "subject": "New Car found",
+        "text": "Check the site"})
+}
+
 function sendEmail(cars) {
     console.log("here are what the emailer was passed", cars);
+    console.log("emailName",process.env.emailName,"PW",process.env.emailPassword);
     var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'Mailgun',
         auth: {
             user: process.env.emailName,
             pass: process.env.emailPassword
