@@ -243,7 +243,6 @@ function send_simple_message(){
 
 function sendEmail(cars) {
     console.log("here are what the emailer was passed", cars);
-    console.log("emailName",process.env.emailName,"PW",process.env.emailPassword);
     var transporter = nodemailer.createTransport({
         service: 'Mailgun',
         auth: {
@@ -253,10 +252,10 @@ function sendEmail(cars) {
     });
 
     var mailOptions = {
-        from: 'yourComputer@mac.com',
+        from: 'yourServer@Carscraper.com',
         to: 'exoticimage@hotmail.com',
-        subject: 'New GT350 found!',
-        text: 'There is a new car found!.'
+        subject: cars.length + ' New car(s) found!',
+        text: "At least one new car found.  "+cars[0].dealer+" has one.  They are "+cars[0].dist+" and it's "+cars[0].color+".  They want "+cars[0].price+" for it.  Check your site for more details and verify if VIN: "+cars[0].vin+" has the right options."
     };
 
     var emailStatus = transporter.sendMail(mailOptions, function(error, info) {
