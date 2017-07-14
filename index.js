@@ -175,13 +175,13 @@ function updateDB(car) {
                 resolve(car)
             } else {
                 //update the listing
-                if (car.price != result.price) {
+                if (car.price != result.price && !car.archived) {
                     console.log("updating price");
                     db.car.update({
                         price: car.price
                     }, {
                         where: {
-                            vin: car.vin
+                            vin: car.vin,
                         }
                     });
                     };
