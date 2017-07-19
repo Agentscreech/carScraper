@@ -72,7 +72,7 @@ function rankCars(cars){
     cars.sort(function(a,b){
         return a.rank-b.rank;
     });
-    return cars
+    return carsByPrice
 }
 
 HomeCompCtrl.$inject = ['$scope','$window','CarList','$sce'];
