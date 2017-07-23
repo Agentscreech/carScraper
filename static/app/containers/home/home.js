@@ -39,17 +39,17 @@ function rankCars(cars){
     cars = cars.filter(function(car){
         return car.archived == false;
     });
-    var carsByDistance = cars.slice(0).sort(function(a,b){
-        var arr1 = a.dist.split(" "), arr2 = b.dist.split(" ");
-        var aa = parseInt(arr1[0]), bb = parseInt(arr2[0]);
-        if (aa > bb){
-            return 1
-        }
-        if (aa < bb){
-            return -1
-        }
-        return 0
-    });
+    // var carsByDistance = cars.slice(0).sort(function(a,b){
+    //     var arr1 = a.dist.split(" "), arr2 = b.dist.split(" ");
+    //     var aa = parseInt(arr1[0]), bb = parseInt(arr2[0]);
+    //     if (aa > bb){
+    //         return 1
+    //     }
+    //     if (aa < bb){
+    //         return -1
+    //     }
+    //     return 0
+    // });
     //Add the distance @ $1/mile to the price then sort it.  That would weight the distance more since you'll have pay to travel to the location.
     var carsByPrice = cars.slice(0).sort(function(a,b){
             var arr1 = a.price.split("$"), arr2 = b.price.split("$");
@@ -64,14 +64,14 @@ function rankCars(cars){
 
     });
     //for each car, find the index of it in each of the arrays then add them.  Set that to a rank property
-    cars.forEach(function(car){
-        var rank = carsByDistance.indexOf(car) + carsByPrice.indexOf(car) - 1;
-        car.rank = rank;
-    });
-    //now sort by that new rank
-    cars.sort(function(a,b){
-        return a.rank-b.rank;
-    });
+    // cars.forEach(function(car){
+    //     var rank = carsByDistance.indexOf(car) + carsByPrice.indexOf(car) - 1;
+    //     car.rank = rank;
+    // });
+    // //now sort by that new rank
+    // cars.sort(function(a,b){
+    //     return a.rank-b.rank;
+    // });
     return carsByPrice
 }
 
