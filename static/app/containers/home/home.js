@@ -8,17 +8,6 @@ angular.module('App')
 function HomeCompCtrl($scope,$window,CarList,$sce) {
     var homeComp = this;
     homeComp.cars = "";
-    homeComp.colors = ["Black","Blue","Gray","Red","White", "Yellow"];
-    homeComp.years = ["2016", "2017", "2018"];
-    homeComp.trims = ["Shelby GT350", "Shelby GT350R"];
-    search = {
-        zipcode : "",
-        radius : "",
-        minYear : "",
-        maxYear : "",
-        trims : [],
-        colors : []
-    }
 
 
     homeComp.archive = function(id){
