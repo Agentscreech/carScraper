@@ -1,5 +1,3 @@
-
-
 <div class="text-center">
     <h1>Here's your list of GT350s</h1>
     <button class="btn btn-danger" ng-if="homeComp.updaterStatus" ng-click="homeComp.update()">STOP AUTO-UPDATE</button>
@@ -9,33 +7,35 @@
 
 <div ng-repeat="car in homeComp.cars">
     <div ng-if="car.archived == false">
-        <div class="row well">
+        <div id="{{car.id}}">
+            <div class="row well">
 
-            <div class="col-xs-6" id="{{car.id}}">
-                <img ng-src="{{car.pic}}">
-            </div>
-            <div class="col-xs-6">
-                <!-- <button class="btn btn-danger" ng-click="homeComp.archive(car.id)">archive</button> -->
-                <button class="btn btn-primary pull-right"><a href="{{car.url}}" target="_blank"></a>View Listing</button>
-                <p>{{car.dist}}</p>
-                <p>Color: {{car.color}}</p>
-                <p>Price: {{car.price}}</p>
-                <p>Dealer: {{car.dealer}}</p>
-                <p>address: {{car.address}}</p>
-                <p>phone: {{car.phone}}</p>
-                <p>vin: {{car.vin}}</p>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 text-right">
-                    Show PDF: <input type="checkbox" ng-model="car.showPdf">
+                <div class="col-xs-6">
+                    <img ng-src="{{car.pic}}">
                 </div>
-                <div class="pdf" ng-show="car.showPdf">
-                    <iframe ng-src="{{car.pdf}}" align="middle" width="100%" height="700" frameborder="0">
+                <div class="col-xs-6">
+                    <button class="btn btn-danger" ng-click="homeComp.archive(car.id)">Archive</button>
+                    <a href="{{car.url}}" class="btn btn-primary pull-right" target="_blank">View Listing</a>
+                    <p>{{car.dist}}</p>
+                    <p>Color: {{car.color}}</p>
+                    <p>Price: {{car.price}}</p>
+                    <p>Dealer: {{car.dealer}}</p>
+                    <p>address: {{car.address}}</p>
+                    <p>phone: {{car.phone}}</p>
+                    <p>vin: {{car.vin}}</p>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 text-right">
+                        Show PDF: <input type="checkbox" ng-model="car.showPdf">
+                    </div>
+                    <div class="pdf" ng-show="car.showPdf">
+                        <iframe ng-src="{{car.pdf}}" align="middle" width="100%" height="700" frameborder="0">
                             <p>Your browser does not support iframes.</p>
                         </iframe>
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
 </div>
